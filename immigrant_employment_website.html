@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imported Labour — The Evolution of Immigrant Employment in Canada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1209;
+    --cream: #f5f0e8;
+    --parchment: #e8dfc9;
+    --rust: #b84a1e;
+    --gold: #c9963a;
+    --steel: #3d5a6e;
+    --forest: #2d4a35;
+    --ash: #6b6259;
+    --light-ash: #a89f95;
+    --white: #fdfaf5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── NAV ─────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--ink);
+    padding: 0 2rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  nav .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+  }
+  nav ul a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--light-ash);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  nav ul a:hover { color: var(--cream); }
+
+  /* ─── HERO ────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    padding-top: 52px;
+    background: var(--ink);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-texture {
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.015) 2px,
+        rgba(255,255,255,0.015) 3px
+      );
+    pointer-events: none;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6rem 4rem 6rem 5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .hero-tag::before {
+    content: '';
+    display: inline-block;
+    width: 2rem;
+    height: 1px;
+    background: var(--rust);
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 6vw, 6rem);
+    font-weight: 900;
+    line-height: 1.0;
+    color: var(--cream);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--light-ash);
+    max-width: 440px;
+    margin-bottom: 3rem;
+    line-height: 1.8;
+  }
+
+  .hero-byline {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--ash);
+    letter-spacing: 0.1em;
+  }
+
+  .hero-right {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-visual {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .timeline-spine {
+    position: absolute;
+    left: 50%;
+    top: 15%;
+    bottom: 15%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--gold) 20%, var(--gold) 80%, transparent);
+    transform: translateX(-50%);
+  }
+
+  .era-dot {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .era-dot::after {
+    content: attr(data-label);
+    position: absolute;
+    left: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--ash);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .era-dot:nth-child(2) { top: 18%; }
+  .era-dot:nth-child(3) { top: 34%; }
+  .era-dot:nth-child(4) { top: 50%; }
+  .era-dot:nth-child(5) { top: 66%; }
+  .era-dot:nth-child(6) { top: 82%; }
+
+  /* ─── SCROLL INDICATOR ─── */
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  .scroll-hint span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--ash);
+    text-transform: uppercase;
+  }
+  .scroll-arrow {
+    width: 1px;
+    height: 2rem;
+    background: linear-gradient(to bottom, var(--ash), transparent);
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ─── INTRO THESIS ─── */
+  .thesis-section {
+    background: var(--parchment);
+    padding: 7rem 5rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 5rem;
+    align-items: start;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .thesis-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rust);
+    padding-top: 0.5rem;
+    position: sticky;
+    top: 6rem;
+  }
+
+  .thesis-body blockquote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: 2rem;
+    padding-left: 2rem;
+    border-left: 3px solid var(--gold);
+  }
+
+  .thesis-body p {
+    font-size: 1rem;
+    color: #3d3328;
+    margin-bottom: 1rem;
+    max-width: 680px;
+  }
+
+  /* ─── CHAPTER SECTIONS ─── */
+  .chapter {
+    padding: 7rem 5rem;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .chapter:nth-child(odd) { background: var(--white); }
+  .chapter:nth-child(even) { background: var(--cream); }
+
+  .chapter-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 4rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--parchment);
+  }
+
+  .chapter-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--parchment);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    user-select: none;
+  }
+  .chapter:nth-child(even) .chapter-number {
+    color: rgba(0,0,0,0.07);
+  }
+
+  .chapter-meta {}
+  .chapter-era {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 0.75rem;
+  }
+  .chapter-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+  .chapter-subtitle {
+    font-size: 0.95rem;
+    color: var(--ash);
+    max-width: 600px;
+    line-height: 1.7;
+  }
+
+  .chapter-body {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .chapter-body.reverse { grid-template-columns: 1fr 2fr; }
+  .chapter-body.reverse .chapter-text { order: 2; }
+  .chapter-body.reverse .chapter-aside { order: 1; }
+
+  .chapter-text p {
+    font-size: 1rem;
+    line-height: 1.85;
+    color: #2e2820;
+    margin-bottom: 1.25rem;
+  }
+
+  .chapter-aside {}
+
+  .stat-card {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gold);
+  }
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--light-ash);
+    text-transform: uppercase;
+  }
+  .stat-note {
+    font-size: 0.8rem;
+    color: var(--ash);
+    margin-top: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .pull-quote {
+    padding: 2rem;
+    border-left: 3px solid var(--rust);
+    background: var(--parchment);
+    margin-bottom: 1.5rem;
+  }
+  .pull-quote p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+  .pull-quote cite {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--ash);
+    font-style: normal;
+    text-transform: uppercase;
+  }
+
+  /* ─── DARK CHAPTER (CPR) ─── */
+  .chapter.dark-chapter {
+    background: var(--ink);
+  }
+  .chapter.dark-chapter .chapter-number { color: rgba(255,255,255,0.05); }
+  .chapter.dark-chapter .chapter-era { color: var(--rust); }
+  .chapter.dark-chapter .chapter-title { color: var(--cream); }
+  .chapter.dark-chapter .chapter-subtitle { color: var(--light-ash); }
+  .chapter.dark-chapter .chapter-header { border-bottom-color: rgba(255,255,255,0.1); }
+  .chapter.dark-chapter .chapter-text p { color: #c8bfb4; }
+  .chapter.dark-chapter .pull-quote {
+    background: rgba(255,255,255,0.05);
+    border-left-color: var(--gold);
+  }
+  .chapter.dark-chapter .pull-quote p { color: var(--cream); }
+  .chapter.dark-chapter .pull-quote cite { color: var(--ash); }
+  .chapter.dark-chapter .stat-card {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .chapter.dark-chapter .stat-card::before { background: var(--rust); }
+  .chapter.dark-chapter .chapter-body { border: none; }
+
+  /* ─── VISUAL TIMELINE BAR ─── */
+  .timeline-bar {
+    background: var(--ink);
+    padding: 4rem 5rem;
+    overflow: hidden;
+  }
+  .timeline-bar h2 {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-bottom: 3rem;
+  }
+  .timeline-track {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    height: 120px;
+  }
+  .timeline-track::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+  }
+  .timeline-event {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 0.5rem;
+    position: relative;
+    cursor: default;
+  }
+  .timeline-event::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0.5rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .event-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+  }
+  .event-desc {
+    font-size: 0.72rem;
+    color: var(--ash);
+    line-height: 1.4;
+    padding-bottom: 1.2rem;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .timeline-event:hover .event-desc {
+    color: var(--cream);
+    border-bottom-color: var(--rust);
+  }
+
+  /* ─── INTERACTIVE QUIZ ─── */
+  .quiz-section {
+    background: var(--steel);
+    padding: 7rem 5rem;
+    color: var(--white);
+  }
+  .quiz-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--white);
+  }
+  .quiz-intro {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.7);
+    max-width: 600px;
+    margin-bottom: 3rem;
+  }
+
+  .quiz-container {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 3rem;
+    max-width: 700px;
+  }
+
+  .quiz-step { display: none; }
+  .quiz-step.active { display: block; }
+
+  .quiz-question {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--white);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .quiz-option {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.8);
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .quiz-option:hover {
+    background: rgba(255,255,255,0.14);
+    color: var(--white);
+    border-color: var(--gold);
+  }
+  .quiz-option.selected {
+    background: rgba(201,150,58,0.2);
+    border-color: var(--gold);
+    color: var(--white);
+  }
+
+  .quiz-next {
+    margin-top: 1.5rem;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 0.85rem 2.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s;
+    display: none;
+  }
+  .quiz-next:hover { opacity: 0.85; }
+  .quiz-next.visible { display: inline-block; }
+
+  .quiz-result {
+    display: none;
+  }
+  .quiz-result.active {
+    display: block;
+  }
+
+  .result-era {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+  .result-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+  .result-desc {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    max-width: 580px;
+  }
+  .result-verdict {
+    background: rgba(184,74,30,0.25);
+    border-left: 3px solid var(--rust);
+    padding: 1.25rem 1.5rem;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+  }
+  .quiz-restart {
+    background: transparent;
+    color: var(--light-ash);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 0.75rem 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quiz-restart:hover {
+    color: var(--white);
+    border-color: var(--white);
+  }
+
+  /* ─── SOURCES ─── */
+  .sources-section {
+    background: var(--parchment);
+    padding: 6rem 5rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+  }
+  .sources-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 3rem;
+    color: var(--ink);
+  }
+  .source-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    max-width: 1000px;
+  }
+  .source-item {
+    padding: 1.5rem;
+    background: var(--white);
+    border-top: 2px solid var(--gold);
+  }
+  .source-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--rust);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+  .source-citation {
+    font-size: 0.82rem;
+    color: #3d3328;
+    line-height: 1.6;
+  }
+  .source-type {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--light-ash);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+  }
+
+  /* ─── CONCEPTS ─── */
+  .concepts-section {
+    background: var(--forest);
+    padding: 5rem 5rem;
+    color: var(--cream);
+  }
+  .concepts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+  .concept-card {
+    padding: 1.5rem;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .concept-type {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .concept-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--cream);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+  .concept-desc {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--ink);
+    padding: 3rem 5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  footer .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--cream);
+  }
+  footer .footer-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--ash);
+    letter-spacing: 0.08em;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  /* ─── UTILITY ─── */
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .section-tag::before {
+    content: '';
+    width: 1.5rem;
+    height: 1px;
+    background: var(--rust);
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 3rem 0;
+    opacity: 0.3;
+  }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .thesis-section, .chapter { padding: 4rem 2rem; }
+    .thesis-section { grid-template-columns: 1fr; gap: 2rem; }
+    .chapter-body, .chapter-body.reverse { grid-template-columns: 1fr; }
+    .chapter-body.reverse .chapter-text { order: 1; }
+    .chapter-body.reverse .chapter-aside { order: 2; }
+    .source-list { grid-template-columns: 1fr; }
+    .concepts-grid { grid-template-columns: 1fr; }
+    nav ul { display: none; }
+    .timeline-bar { padding: 3rem 2rem; }
+    .quiz-section { padding: 4rem 2rem; }
+    .sources-section { padding: 4rem 2rem; }
+    .concepts-section { padding: 4rem 2rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    footer .footer-meta { text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Imported Labour</div>
+  <ul>
+    <li><a href="#intro">Overview</a></li>
+    <li><a href="#ch1">Railways</a></li>
+    <li><a href="#ch2">Prairies</a></li>
+    <li><a href="#ch3">Points System</a></li>
+    <li><a href="#ch4">Today</a></li>
+    <li><a href="#quiz">Activity</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-texture"></div>
+  <div class="hero-left">
+    <div class="hero-tag">Grade 11 Interdisciplinary Final Project · Canadian History & English</div>
+    <h1>Imported<br><em>Labour</em></h1>
+    <p class="hero-sub">The Evolution of Immigrant Employment in Canada — from the railway camps of 1881 to the credential recognition crisis of 2025, Canada has always needed immigrant labour. The question is whether it ever truly valued it.</p>
+    <div class="hero-byline">Winnipeg, Manitoba · 2025–2026 Academic Year</div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-visual">
+      <div class="timeline-spine"></div>
+      <div class="era-dot" data-label="1881–1885  CPR Construction"></div>
+      <div class="era-dot" data-label="1896–1914  Prairie Settlement"></div>
+      <div class="era-dot" data-label="1967  Points System"></div>
+      <div class="era-dot" data-label="1976–2001  Immigration Acts"></div>
+      <div class="era-dot" data-label="2015–2025  Express Entry Era"></div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- THESIS -->
+<section class="thesis-section" id="intro">
+  <div class="thesis-label">Central Argument</div>
+  <div class="thesis-body">
+    <blockquote>
+      "Canada has consistently recruited immigrant labour to power its economy, then failed to integrate those workers as equals — across every era, across every policy reform."
+    </blockquote>
+    <p>From the 17,000 Chinese men who died building the CPR for one dollar a day, to the Syrian-trained physicians who spend years working as medical assistants because their credentials aren't recognized — the pattern repeats. The tools of exclusion change. The exclusion does not.</p>
+    <p>This project traces that history across five chapters: the railway era of explicit exploitation, the prairie settlement era of selective welcome, the 1967 Points System that removed racial barriers on paper, the post-1976 era of growing complexity, and the modern credential recognition crisis that reveals how much unfinished work remains.</p>
+    <p>Understanding this history matters because Canada is now one of the most immigration-dependent countries in the developed world. Since 2012, <em>all</em> Canadian labour force growth has come from immigration. Getting immigrant employment right isn't a humanitarian nicety — it's an economic necessity. And we are still getting it wrong.</p>
+  </div>
+</section>
+
+<!-- KEY POLICY TIMELINE -->
+<div class="timeline-bar">
+  <h2>Key Policy Moments — 1867 to 2025</h2>
+  <div class="timeline-track">
+    <div class="timeline-event">
+      <div class="event-year">1867</div>
+      <div class="event-desc">Confederation. Immigration becomes a federal responsibility.</div>
+    </div>
+    <div class="timeline-event">
+      <div class="event-year">1881</div>
+      <div class="event-desc">17,000 Chinese labourers recruited to build CPR through the Rockies.</div>
+    </div>
+    <div class="timeline-event">
+      <div class="event-year">1885</div>
+      <div class="event-desc">CPR completed. Chinese Immigration Act passes. $50 head tax imposed.</div>
+    </div>
+    <div class="timeline-event">
+      <div class="event-year">1896</div>
+      <div class="event-desc">Sifton becomes Minister of Interior. "Last Best West" campaign begins.</div>
+    </div>
+    <div class="timeline-event">
+      <div class="event-year">1913</div>
+      <div class="event-desc">Peak immigration year: 400,870 arrivals — a record never surpassed.</div>
+    </div>
+    <div class="timeline-event">
+      <div class="event-year">1923</div>
+      <div class="event-desc">Chinese Immigration Act. Fewer than 50 Chinese admitted over next 24 years.</div>
+    </div>
+    <div class="timeline-event">
+      <div class="event-year">1967</div>
+      <div class="event-desc">Points System replaces race-based selection. Asia surpasses Europe as source.</div>
+    </div>
+    <div class="timeline-event">
+      <div class="event-year">1971</div>
+      <div class="event-desc">Multiculturalism adopted as official policy.</div>
+    </div>
+    <div class="timeline-event">
+      <div class="event-year">2006</div>
+      <div class="event-desc">Harper government formally apologizes for Chinese head tax.</div>
+    </div>
+    <div class="timeline-event">
+      <div class="event-year">2015</div>
+      <div class="event-desc">Express Entry system launched. Job offers prioritized over credentials.</div>
+    </div>
+    <div class="timeline-event">
+      <div class="event-year">2025</div>
+      <div class="event-desc">Overqualified immigrants earn 46% less than non-immigrants in same field.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAPTER 1: CPR -->
+<section class="chapter dark-chapter" id="ch1">
+  <div class="chapter-header">
+    <div class="chapter-number">01</div>
+    <div class="chapter-meta">
+      <div class="chapter-era">1881 – 1885 · The Railway Era</div>
+      <h2 class="chapter-title">You Must Have This Labour,<br>or You Can't Have the Railway</h2>
+      <p class="chapter-subtitle">Prime Minister John A. Macdonald, 1882. The most honest thing the Canadian government ever said about Chinese workers — and the logic that would define immigrant employment for generations.</p>
+    </div>
+  </div>
+  <div class="chapter-body">
+    <div class="chapter-text">
+      <p>The Canadian Pacific Railway was the infrastructure that made Canada possible — a ribbon of steel connecting the Pacific coast to the Atlantic, fulfilling the promise that brought British Columbia into Confederation in 1871. Building it required blasting through the Rocky Mountains, a task so dangerous and so labour-intensive that contractors initially couldn't find enough workers willing to do it.</p>
+      <p>The solution was 17,000 men from the Guangdong and Fujian provinces of southern China. They came for the same reason immigrants have always come to Canada: the promise of work, and the possibility of a better life. Many planned to send money home to families they had left behind; many hoped to return. Instead, they built a country that didn't want them to stay.</p>
+      <p>Chinese workers were paid approximately $1 per day — less than half the wages earned by their white co-workers for identical or more dangerous work. They received no food, no shelter, and no medical care from the CPR. They were assigned the most lethal tasks: drilling through unstable rock, placing explosive charges by hand, hanging from rope baskets over cliff faces. An estimated 600 to 700 died in construction — a figure that historians now consider a significant undercount, since Chinese deaths were often not recorded at all.</p>
+      <p>One of the few surviving accounts from a Chinese worker's perspective comes from Dukesang Wong, who kept a diary during construction. After four years of labour, he wrote: "Times for us now are definitely changing, and the fortunes of our people need great care and guarding." His hope was not rewarded. On November 7, 1885 — the date the last spike was driven — the CPR president William Van Horne declared the work "well done in every way." He did not mention the Chinese workers who made it possible.</p>
+      <p>Within months, the same federal government that had called Chinese labour indispensable passed the Chinese Immigration Act of 1885, imposing a $50 head tax on any Chinese person entering Canada. The message was unambiguous: you were useful while we needed you. Now you are a problem to be managed. The head tax was raised to $100 in 1900 and $500 in 1903 — equivalent to over $18,000 today, and nearly two years' wages for a railway worker. In 1923, the Chinese Immigration Act effectively banned all Chinese immigration, with fewer than 50 Chinese immigrants admitted to Canada between 1924 and 1947.</p>
+      <p>This was not an accident or an oversight. It was policy — the deliberate use of immigrant labour as a commodity, followed by the deliberate exclusion of those workers from the country they built. It is the foundational pattern of Canadian immigrant employment history.</p>
+    </div>
+    <div class="chapter-aside">
+      <div class="stat-card">
+        <span class="stat-number">700+</span>
+        <span class="stat-label">Chinese Workers Who Died Building the CPR</span>
+        <p class="stat-note">Historians consider this a significant undercount — Chinese deaths were often unrecorded.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">$1/day</span>
+        <span class="stat-label">Daily Wage for Chinese Workers</span>
+        <p class="stat-note">White workers doing the same work earned $1.50–$2.50/day. Chinese workers also paid for their own food and supplies from this wage.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">$500</span>
+        <span class="stat-label">Head Tax by 1903</span>
+        <p class="stat-note">Equivalent to roughly $18,000+ today. Chinese Canadians who served in WWII fought for citizenship, finally granted in 1947. Canada's formal apology came in 2006.</p>
+      </div>
+      <div class="pull-quote">
+        <p>"It is simply a question of alternatives: either you must have this labour or you can't have the railway."</p>
+        <cite>— Prime Minister John A. Macdonald, House of Commons, 1882</cite>
+      </div>
+      <div class="pull-quote">
+        <p>"The CPR treated Chinese workers as if they were commodities, expendable and easily replaceable resources."</p>
+        <cite>— NICHE Canada, environmental history journal, 2023</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAPTER 2: PRAIRIES -->
+<section class="chapter" id="ch2">
+  <div class="chapter-header">
+    <div class="chapter-number">02</div>
+    <div class="chapter-meta">
+      <div class="chapter-era">1896 – 1914 · The Prairie Settlement Era</div>
+      <h2 class="chapter-title">Only Farmers Need Apply:<br>The Last Best West</h2>
+      <p class="chapter-subtitle">Under Minister Clifford Sifton, Canada launched the most aggressive immigration recruitment campaign in its history — and one of the most explicitly racialized.</p>
+    </div>
+  </div>
+  <div class="chapter-body reverse">
+    <div class="chapter-text">
+      <p>By the 1890s, Canada faced a crisis: the prairies were empty, and Canadians were leaving — nearly one million had emigrated to the United States during the 1880s, attracted by the American Homestead Act. The newly completed railway had opened the West, but no one was settling it. In 1896, Prime Minister Wilfrid Laurier appointed Clifford Sifton as Minister of the Interior with a single mandate: fill the prairies.</p>
+      <p>Sifton's campaign — marketed under the slogan "The Last Best West" — was, in purely logistical terms, one of the most successful immigration drives in world history. Between 1896 and 1914, more than two million settlers poured into the Canadian prairies. In 1913 alone, 400,870 immigrants arrived — a single-year record that has never been broken. The provinces of Alberta and Saskatchewan were created in 1905 largely because enough settlers had arrived to warrant provincial status.</p>
+      <p>Sifton's genius was recruitment strategy: he distributed millions of promotional pamphlets across Britain, northern Europe, and the United States, promising 160 free acres of fertile land to anyone who would farm it. He offered commissions to shipping company agents for each qualified immigrant they brought to Canada. He organized tours of the prairies for journalists. He understood, before the age of mass media, how to sell a country.</p>
+      <p>But the campaign was explicitly selective in ways that reveal its racial logic. Sifton's preferences, in his own words, were for northern Europeans over southern Europeans, and whites over non-whites. He believed the ideal immigrant was what he called "a stalwart peasant in a sheepskin coat" — someone with experience farming prairie-like conditions, specifically from central and eastern Europe: Ukrainians, Germans, Scandinavians, Doukhobors from Russia. African Americans who wanted to homestead in Alberta were actively discouraged by government agents, despite having extensive farming experience. Asian immigrants remained subject to the head tax and other restrictions.</p>
+      <p>The categories of work were rigidly enforced. Sifton did not want urban workers, merchants, or intellectuals — he wanted agricultural labour. Domestics (women, overwhelmingly from Britain) were the second major recruitment category. The government's 1899 archive documents the import of women aged 17 to 35 as domestic servants, with recruitment agencies in London acting as placement firms. By 1906, 4,467 women per year were entering Canada as domestics.</p>
+      <p>The prairie settlement era thus reveals the second major theme of this project: that Canada's welcome has never been unconditional. Immigrants were wanted for specific types of labour, in specific locations, of specific ethnic backgrounds. The moment someone fell outside those categories — by arriving from the wrong country, working in the wrong field, or having the wrong skin colour — the welcome evaporated.</p>
+    </div>
+    <div class="chapter-aside">
+      <div class="stat-card" style="background: var(--ink); color: var(--cream);">
+        <span class="stat-number">2M+</span>
+        <span class="stat-label">Settlers 1896–1914</span>
+        <p class="stat-note">The largest immigration wave in Canadian history, driven by Sifton's aggressive recruitment campaign.</p>
+      </div>
+      <div class="stat-card" style="background: var(--ink); color: var(--cream);">
+        <span class="stat-number">400,870</span>
+        <span class="stat-label">Immigrants in 1913</span>
+        <p class="stat-note">A single-year record that stands to this day — more than a century later.</p>
+      </div>
+      <div class="pull-quote">
+        <p>"A stalwart peasant in a sheepskin coat, born on the soil, is good quality."</p>
+        <cite>— Clifford Sifton, Maclean's Magazine, 1922, describing his ideal immigrant</cite>
+      </div>
+      <div class="pull-quote">
+        <p>"The government attempted to engineer a society that reflected their values... who can say how the Prairie provinces would be different today had they been more successful?"</p>
+        <cite>— Historian cited in Canada's History magazine on Sifton's campaign</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAPTER 3: POINTS SYSTEM -->
+<section class="chapter" id="ch3">
+  <div class="chapter-header">
+    <div class="chapter-number">03</div>
+    <div class="chapter-meta">
+      <div class="chapter-era">1967 · The Points System</div>
+      <h2 class="chapter-title">Merit Over Race:<br>The Promise and the Problem</h2>
+      <p class="chapter-subtitle">The 1967 Immigration Regulations replaced race-based selection with a points system — Canada's most significant immigration reform, and the beginning of new, more subtle inequities.</p>
+    </div>
+  </div>
+  <div class="chapter-body">
+    <div class="chapter-text">
+      <p>By the early 1960s, the racial architecture of Canadian immigration policy was increasingly difficult to justify publicly. The Universal Declaration of Human Rights had been adopted in 1948. The civil rights movement was transforming North America. Canada's own Diefenbaker government had passed the Canadian Bill of Rights in 1960. The idea that immigration policy should openly favour white Europeans was becoming untenable.</p>
+      <p>In 1962, regulations began dismantling the most explicitly racist elements of the system. In 1967, the Pearson government formalized the transformation: the Points System was born. Independent applicants would now be assessed on nine measurable criteria — education and training, personal character, occupational demand, occupational skill, age, pre-arranged employment, knowledge of French and English, relatives in Canada, and employment opportunities in their destination — and those who scored 50 or more out of 100 points would be admitted.</p>
+      <p>The Points System was a genuine reform. It removed the explicit nationality criteria that had governed Canadian immigration since Confederation. It created transparent, standardized standards that applied regardless of where applicants came from. And it worked: before 1967, over 90% of immigrants to Canada came from Europe. By the period 2006–2011, Asia and the Middle East accounted for 56.9% of new arrivals. The Points System diversified Canada in ways that were profound and irreversible.</p>
+      <p>But it also created new problems that were not immediately visible. The system was designed to select for skills — but it said nothing about whether those skills would be recognized once immigrants arrived. Canada was now selecting engineers, doctors, lawyers, and accountants from around the world based on their qualifications. It had no mechanism to ensure that, once in Canada, those qualifications would be accepted by Canadian employers and regulatory bodies.</p>
+      <p>This gap between selection and integration became the defining challenge of the post-1967 era. Immigrants were admitted because of their credentials. They arrived to find those credentials didn't transfer. They were told their education was "equivalent" but their "Canadian experience" was insufficient. They were overqualified for low-skill jobs and under-recognized for professional positions. The phenomenon became known as "brain waste" — and it would reach crisis proportions by the 21st century.</p>
+      <p>The 1967 reform was essential and necessary. But it was only half of a solution. Canada redesigned who it would let in — without redesigning how it would help them thrive.</p>
+    </div>
+    <div class="chapter-aside">
+      <div class="stat-card">
+        <span class="stat-number">9</span>
+        <span class="stat-label">Assessment Categories in the 1967 Points System</span>
+        <p class="stat-note">Education, skill, language, age, employment, relatives, personal character, occupational demand, destination opportunities. Score 50/100 to qualify.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">56.9%</span>
+        <span class="stat-label">of immigrants from Asia & Middle East by 2006–2011</span>
+        <p class="stat-note">Before 1967, over 90% of immigrants to Canada came from Europe. The demographic shift was historic.</p>
+      </div>
+      <div class="pull-quote">
+        <p>"The points system made standards transparent [and] created a defensible metric for arguing that admissions served national economic objectives rather than ethnic preference."</p>
+        <cite>— University of Ottawa research on the 1967 Immigration Regulations</cite>
+      </div>
+      <div class="pull-quote">
+        <p>"Canada redesigned who it would let in — without redesigning how it would help them thrive."</p>
+        <cite>— Project thesis</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAPTER 4: TODAY -->
+<section class="chapter dark-chapter" id="ch4">
+  <div class="chapter-header">
+    <div class="chapter-number">04</div>
+    <div class="chapter-meta">
+      <div class="chapter-era">2000s – 2025 · The Modern Era</div>
+      <h2 class="chapter-title">Brain Waste:<br>The Crisis That Keeps Being Rediscovered</h2>
+      <p class="chapter-subtitle">Today, Canada admits more immigrants than ever — and continues to systematically underemploy them. The tools of exclusion have changed; the pattern has not.</p>
+    </div>
+  </div>
+  <div class="chapter-body">
+    <div class="chapter-text">
+      <p>In 2025, Canada faces a paradox that would be darkly familiar to a Chinese railway worker in 1885: the country needs you, brings you here for your labour, and then creates barriers that prevent you from contributing what you actually know how to do.</p>
+      <p>The modern version of this story is called "brain waste" — the systematic underemployment of highly skilled immigrants in jobs far below their qualifications. According to a 2025 C.D. Howe Institute report, overqualified immigrants earn, on average, 46% less than non-immigrants working in the fields they trained for. The rate of overqualification among recent immigrants is three times higher than among Canadian-born workers. According to a 2024 Statistics Canada study, over 25% of immigrants with foreign degrees work in jobs that require only a high school diploma.</p>
+      <p>The barriers are structural. In regulated professions like medicine, engineering, nursing, and law, foreign credentials must be assessed by provincial licensing bodies. These processes are complex, expensive, often opaque, and can take years. A physician trained in Syria or India may spend three years working as a medical assistant — if they can find that work — while navigating a requalification maze that costs thousands of dollars and offers no guaranteed outcome. Many give up. Many leave. The phenomenon of "reverse brain drain" — Canada-based immigrants departing for the United States, Australia, or their home countries — has reached its highest levels in two decades.</p>
+      <p>The federal government has attempted to address this through programs like the Foreign Credential Recognition Program (2009), Express Entry (2015), and various bridging programs administered provincially. Some progress has been made: British Columbia and Nova Scotia have expedited approvals for healthcare professionals. But experts consistently note that the system remains too fragmented — credential recognition falls under provincial jurisdiction, creating thirteen different frameworks across thirteen jurisdictions — and too slow relative to the speed at which the labour market needs skilled workers.</p>
+      <p>What makes this history remarkable is its continuity. In 1885, Chinese workers were useful for building the railway and then excluded by law. In 1904, British women were imported as domestic servants because that was the work deemed appropriate for them. In 1967, skilled workers from Asia were admitted for the first time — then found their skills weren't recognized. In 2025, Canada selects the world's most credentialed immigrants through Express Entry, then watches them drive taxis and work cashier shifts while their medical or engineering degrees sit on a shelf. The tools have changed; the pattern has not. The question is whether it ever will.</p>
+    </div>
+    <div class="chapter-aside">
+      <div class="stat-card">
+        <span class="stat-number">46%</span>
+        <span class="stat-label">Average wage penalty for overqualified immigrants</span>
+        <p class="stat-note">C.D. Howe Institute, 2025. Compared to non-immigrants working in the same field they trained for.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">3×</span>
+        <span class="stat-label">Higher overqualification rate vs. Canadian-born workers</span>
+        <p class="stat-note">Recent immigrants are three times more likely to be working in jobs below their qualification level.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">25%+</span>
+        <span class="stat-label">of immigrants with foreign degrees in low-skill jobs</span>
+        <p class="stat-note">Statistics Canada, 2024. Particularly acute in regulated fields: medicine, engineering, law.</p>
+      </div>
+      <div class="pull-quote">
+        <p>"Overqualified immigrants earn, on average, 46 per cent less than non-immigrants working in the fields they trained for. This wage gap leads to reduced consumer spending, lower tax revenues and strains on social programs."</p>
+        <cite>— C.D. Howe Institute, April 2025</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ / CLASS ACTIVITY -->
+<section class="quiz-section" id="quiz">
+  <div class="section-tag" style="color: var(--gold);">Class Activity</div>
+  <h2>What Job Would Canada Give You?</h2>
+  <p class="quiz-intro">Answer three questions about yourself. Then find out what employment path Canada's immigration system would have assigned you — in each era of this project's history.</p>
+
+  <div class="quiz-container">
+    <!-- Step 1 -->
+    <div class="quiz-step active" id="step1">
+      <p class="quiz-question">What is your highest level of education?</p>
+      <div class="quiz-options">
+        <button class="quiz-option" data-value="no-degree">No post-secondary education</button>
+        <button class="quiz-option" data-value="trade">Trade certification or diploma</button>
+        <button class="quiz-option" data-value="undergrad">University undergraduate degree</button>
+        <button class="quiz-option" data-value="grad">Graduate or professional degree (medicine, law, engineering, etc.)</button>
+      </div>
+      <button class="quiz-next" id="next1">Next →</button>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="quiz-step" id="step2">
+      <p class="quiz-question">Where were you (or would you have been) trained or educated?</p>
+      <div class="quiz-options">
+        <button class="quiz-option" data-value="uk">Britain or Western Europe</button>
+        <button class="quiz-option" data-value="ukraine">Eastern Europe (Ukraine, Poland, Russia, etc.)</button>
+        <button class="quiz-option" data-value="china">China, Hong Kong, or East Asia</button>
+        <button class="quiz-option" data-value="india">South Asia (India, Pakistan, Sri Lanka, etc.)</button>
+        <button class="quiz-option" data-value="africa">Africa, Middle East, or Caribbean</button>
+      </div>
+      <button class="quiz-next" id="next2">Next →</button>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="quiz-step" id="step3">
+      <p class="quiz-question">What is your professional background?</p>
+      <div class="quiz-options">
+        <button class="quiz-option" data-value="farmer">Farming or agricultural work</button>
+        <button class="quiz-option" data-value="labour">Manual labour, construction, or resource extraction</button>
+        <button class="quiz-option" data-value="domestic">Domestic, caregiving, or service work</button>
+        <button class="quiz-option" data-value="skilled">Skilled trade (electrician, carpenter, mechanic, etc.)</button>
+        <button class="quiz-option" data-value="professional">Regulated profession (doctor, engineer, lawyer, nurse)</button>
+      </div>
+      <button class="quiz-next" id="next3">See Your Result →</button>
+    </div>
+
+    <!-- Results -->
+    <div class="quiz-result" id="result">
+      <div class="result-era" id="result-era"></div>
+      <div class="result-title" id="result-title"></div>
+      <div class="result-desc" id="result-desc"></div>
+      <div class="result-verdict" id="result-verdict"></div>
+      <button class="quiz-restart" onclick="restartQuiz()">← Try a Different Profile</button>
+    </div>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<section class="sources-section" id="sources">
+  <div class="section-tag">Research & Citations</div>
+  <h2>Works Cited (MLA Format)</h2>
+  <div class="source-list">
+    <div class="source-item">
+      <div class="source-num">Source 01</div>
+      <p class="source-citation">Government of Canada. "Immigrants to Canada, Porters and Domestics, 1899 to 1949." <em>Library and Archives Canada</em>, 16 Feb. 2026, www.canada.ca/en/library-archives/collection/research-help/genealogy-family-history/immigration/immigrants-canada-porters-domestics-1899-1949.html.</p>
+      <div class="source-type">Primary Government Archive</div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">Source 02</div>
+      <p class="source-citation">"History of Chinese Immigration to Canada." <em>Wikipedia: The Free Encyclopedia</em>, Wikimedia Foundation, accessed Apr. 2026, en.wikipedia.org/wiki/History_of_Chinese_immigration_to_Canada. (Facts cross-checked against cited primary sources.)</p>
+      <div class="source-type">Secondary Source with Verified Primary Citations</div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">Source 03</div>
+      <p class="source-citation">"Immigration Regulations, Order-in-Council PC 1967-1616, 1967." <em>Canadian Museum of Immigration at Pier 21</em>, pier21.ca/research/immigration-history/immigration-regulations-order-in-council-pc-1967-1616-1967. Accessed Apr. 2026.</p>
+      <div class="source-type">Policy Document / Primary Source</div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">Source 04</div>
+      <p class="source-citation">Busby, Kristina. "Canada is Wasting the Talents of its Skilled Immigrants." <em>C.D. Howe Institute</em>, 11 Apr. 2025, cdhowe.org/publication/canada-is-wasting-the-talents-of-its-skilled-immigrants/.</p>
+      <div class="source-type">Policy Research Report</div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">Source 05</div>
+      <p class="source-citation">Statistics Canada. "150 Years of Immigration in Canada." <em>Statistics Canada</em>, catalogue no. 11-630-X, 2016, www150.statcan.gc.ca/n1/pub/11-630-x/11-630-x2016006-eng.htm.</p>
+      <div class="source-type">Government Statistical Source</div>
+    </div>
+    <div class="source-item">
+      <div class="source-num">Additional</div>
+      <p class="source-citation">Multiple additional sources consulted and cross-referenced, including: <em>BC An Untold History</em> on the Head Tax; NICHE Canada on CPR labour history; University of Ottawa research on the Points System origins; Migration Policy Institute analysis; and Royal Alberta Museum (George Yee's story).</p>
+      <div class="source-type">Supporting Research</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS ADDRESSED -->
+<section class="concepts-section">
+  <div class="section-tag" style="color: var(--gold); margin-bottom: 0.5rem;">Curricular Connections</div>
+  <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--cream); margin-bottom: 0.5rem;">History & English Concepts Demonstrated</h2>
+  <div class="concepts-grid">
+    <div class="concept-card">
+      <div class="concept-type">Canadian History</div>
+      <div class="concept-name">Critical Analysis of Primary & Secondary Sources</div>
+      <div class="concept-desc">Government archives, policy documents, and statistical data analyzed alongside scholarship — with attention to the perspective of the source creator.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-type">Canadian History</div>
+      <div class="concept-name">Evaluating Sources for Bias</div>
+      <div class="concept-desc">The LAC domestic servant archive was created by the same government exploiting those workers. The C.D. Howe Institute frames brain waste as economic loss, not human rights violation — both framings are examined.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-type">Canadian History</div>
+      <div class="concept-name">Making Ethical Judgments About Historical Events</div>
+      <div class="concept-desc">The head tax, wage suppression of racialized workers, and current credential barriers are addressed as ethical failures — not merely policy choices to be neutrally described.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-type">Canadian History</div>
+      <div class="concept-name">Cause and Consequence</div>
+      <div class="concept-desc">Each policy is analyzed for downstream effects: head tax → Chinese family separation; 1967 Points System → demographic shift; credential barriers → skilled immigrant departures in 2025.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-type">Canadian History</div>
+      <div class="concept-name">Change and Continuity</div>
+      <div class="concept-desc">The project's core argument: the fundamental pattern of exploiting immigrant labour has persisted across 150 years, even as the legal forms of discrimination changed.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-type">English</div>
+      <div class="concept-name">Critical Analysis of Texts</div>
+      <div class="concept-desc">Government documents, policy reports, and historical records analyzed for subtext, omission, and rhetorical framing — including Macdonald's 1882 parliamentary statement.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-type">English</div>
+      <div class="concept-name">Organize Ideas and Information (Form)</div>
+      <div class="concept-desc">Five-chapter chronological structure with a clear argumentative through-line, designed for both linear reading and selective navigation.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-type">English</div>
+      <div class="concept-name">Build Connections to Self</div>
+      <div class="concept-desc">Reflection on growing up in Winnipeg — a city built by Ukrainian prairie settlers, whose North End community is a direct product of Sifton's immigration campaign.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-type">English</div>
+      <div class="concept-name">Explore Thoughts and Feelings of Others</div>
+      <div class="concept-desc">Primary voices centred throughout: Dukesang Wong's diary, George Yee's head tax certificate, Macdonald's parliamentary speech, contemporary immigrant accounts of credential barriers.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Imported Labour</div>
+  <div class="footer-meta">
+    Grade 11 Interdisciplinary Final Project<br>
+    Canadian History · English · Computer Science<br>
+    Winnipeg, Manitoba · 2025–2026
+  </div>
+</footer>
+
+<script>
+  // Quiz logic
+  let answers = {};
+  let currentStep = 1;
+
+  document.querySelectorAll('.quiz-option').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const step = this.closest('.quiz-step');
+      step.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
+      this.classList.add('selected');
+
+      const stepNum = step.id.replace('step', '');
+      answers['q' + stepNum] = this.dataset.value;
+
+      step.querySelector('.quiz-next').classList.add('visible');
+    });
+  });
+
+  document.getElementById('next1').addEventListener('click', () => goToStep(2));
+  document.getElementById('next2').addEventListener('click', () => goToStep(3));
+  document.getElementById('next3').addEventListener('click', () => showResult());
+
+  function goToStep(n) {
+    document.querySelector('.quiz-step.active').classList.remove('active');
+    document.getElementById('step' + n).classList.add('active');
+    currentStep = n;
+  }
+
+  function showResult() {
+    const edu = answers.q1;
+    const origin = answers.q2;
+    const prof = answers.q3;
+
+    let era, title, desc, verdict;
+
+    // 1885 era: Chinese or Asian + labour/professional
+    if (origin === 'china') {
+      if (prof === 'labour') {
+        era = '1881–1885 · The Railway Era';
+        title = 'CPR Construction Labourer — $1/Day';
+        desc = 'Canada recruited you directly from Guangdong province to blast through the Rocky Mountains. You are assigned the most dangerous tasks: drilling, placing explosives, hanging from rope baskets over cliffs. You receive no food, no shelter, no medical care from the CPR. You work alongside white workers who earn twice your wage for the same or safer work.';
+        verdict = 'When the railway is complete in 1885, the Canadian government passes the Chinese Immigration Act. A $50 head tax — nearly two months\' wages — is imposed on any Chinese person entering Canada. By 1903, it is $500. By 1923, Chinese immigration is effectively banned entirely. The country you built does not want you to stay.';
+      } else if (prof === 'professional' || prof === 'skilled') {
+        era = '1885–1923 · The Exclusion Era';
+        title = 'Excluded — Head Tax Required';
+        desc = 'Your profession and qualifications are irrelevant. China is the only country whose citizens must pay a fee — initially $50, eventually $500 — to enter Canada. The 1923 Chinese Immigration Act then bans nearly all Chinese immigration. Fewer than 50 Chinese immigrants will be admitted to Canada in the next 24 years.';
+        verdict = 'Your credentials, skills, and ambitions do not factor into Canada\'s decision. Your country of origin determines your fate. This is not an accident — it is the explicit, stated policy of the Government of Canada.';
+      } else {
+        era = '1885–1923 · The Exclusion Era';
+        title = 'Subject to the Head Tax';
+        desc = 'Regardless of your profession or education, you must pay the Chinese Head Tax to enter Canada — $50 initially (1885), raised to $100 (1900) and $500 (1903). The tax is equivalent to roughly two years\' wages for a railway worker.';
+        verdict = 'Chinese Canadians who served in World War II fought for and won the right to citizenship in 1947. Canada\'s formal apology for the Head Tax came 59 years later, in 2006.';
+      }
+    }
+
+    // 1896–1914: prairie settler era
+    else if (origin === 'ukraine' && (prof === 'farmer' || prof === 'labour')) {
+      era = '1896–1914 · The Prairie Settlement Era';
+      title = 'Ukrainian Homesteader — 160 Acres of Prairie';
+      desc = 'You are exactly the immigrant Clifford Sifton wanted: an experienced farmer from the Austro-Hungarian Empire, accustomed to harsh conditions, willing to break prairie sod. The Canadian government has distributed pamphlets in your village advertising "The Last Best West." You are offered 160 acres of free land under the Dominion Lands Act, if you agree to farm it.';
+      verdict = 'Your settlement creates the communities that will eventually become Winnipeg\'s North End. The Ukrainian Canadian presence on the prairies is one of the most lasting legacies of Sifton\'s campaign. But during WWI, you and 80,000 other Ukrainian Canadians will be classified as "enemy aliens" and some interned, despite your contribution to building the country.';
+    }
+
+    else if (origin === 'uk' && prof === 'domestic') {
+      era = '1899–1929 · The Domestic Servant Era';
+      title = 'Domestic Servant — Government Recruited';
+      desc = 'You are a single British woman between 17 and 35. Canada\'s Immigration Branch, working with organizations like the Girls\' Friendly Society, has recruited you specifically for domestic work. You are placed with a family — in Winnipeg, in Toronto, in Vancouver — as a household servant. In 1906, 4,467 women like you entered Canada this way.';
+      verdict = 'The work is low-paid and exploitative. You have limited legal protections. If you become pregnant outside marriage, you risk deportation. The Canadian government has imported your labour, but not designed a system to support your wellbeing or advancement.';
+    }
+
+    else if (origin === 'uk' && (prof === 'farmer' || prof === 'labour')) {
+      era = '1896–1914 · The Prairie Settlement Era';
+      title = 'British Settler — Preferred Category';
+      desc = 'You are welcomed enthusiastically. British immigrants were the most desirable in Sifton\'s hierarchy. More than half of the two million settlers who arrived between 1896 and 1914 were from the British Isles. You are settled on the prairies and given access to homestead land.';
+      verdict = 'You are one of the lucky ones — your origin country, your ethnicity, and your profession align perfectly with what Canada wanted from immigration in this era.';
+    }
+
+    // 1967 points system era: South Asian or African + professional
+    else if ((origin === 'india' || origin === 'africa') && prof === 'professional' && edu === 'grad') {
+      era = '1967–2000 · The Points System Era';
+      title = 'Admitted — But Can You Practice?';
+      desc = 'The 1967 Points System has removed the racial barriers that would have excluded you before. You score well: graduate degree (+12 points), professional training (+15 points), English proficiency (+10 points), age (+10 points). You qualify as an independent immigrant and are admitted to Canada. You arrive with a medical degree, or an engineering degree, or a law degree earned after years of study.';
+      verdict = 'Then you discover that your credential must be assessed by a provincial licensing body. The process takes 1–3 years, costs thousands of dollars, and may require you to repeat portions of your training. While you wait, you take whatever work you can find. Canada selected you for your skills. Canada does not have a system to use them.';
+    }
+
+    else if ((origin === 'india' || origin === 'africa') && prof === 'professional') {
+      era = '2000s–2025 · The Brain Waste Era';
+      title = 'Admitted — Overqualified, Underemployed';
+      desc = 'You were selected through Express Entry based on your professional credentials. Canada scored you highly. You arrived. Now you are applying for jobs and being told you lack "Canadian experience." Your degree is recognized in principle but you still need licensing, which requires Canadian references, which you cannot get without Canadian experience. It is a circle with no entry point.';
+      verdict = 'According to the C.D. Howe Institute (2025), you will earn on average 46% less than a non-immigrant in your field. 25% of immigrants with foreign degrees work in jobs requiring only a high school diploma. You are three times more likely to be overqualified than a Canadian-born worker. This is the modern face of Canada\'s immigrant employment paradox.';
+    }
+
+    // Generic fallback
+    else if (prof === 'professional' && edu === 'grad') {
+      era = '2015–2025 · The Express Entry Era';
+      title = 'High CRS Score — But Watch for the Gap';
+      desc = 'Express Entry, introduced in 2015, ranks you highly for your graduate credentials and professional experience. You receive an Invitation to Apply and become a permanent resident. You have done everything right by Canada\'s system. You arrive ready to contribute.';
+      verdict = 'The credential recognition system is still fragmented across 13 provincial jurisdictions. There is no national standard. Programs like the Foreign Credential Recognition Program (established 2009) exist but are underfunded and slow. The gap between who Canada selects and how Canada supports them remains the central unresolved challenge of Canadian immigration policy.';
+    }
+
+    else {
+      era = '1896–1960 · The Agricultural & Industrial Era';
+      title = 'Admitted for Manual Labour';
+      desc = 'During most of Canada\'s immigration history before 1967, you would have been admitted primarily if you were willing to work in agriculture, construction, or domestic service — regardless of other skills you might have had. The labour hierarchy was clear: farmers first, domestics second, industrial workers third.';
+      verdict = 'The skills-based Points System of 1967 was designed to fix this — to admit people based on what they could contribute, not just what category of work they were willing to do. Whether it succeeded is the central question of this project.';
+    }
+
+    document.getElementById('result-era').textContent = era;
+    document.getElementById('result-title').textContent = title;
+    document.getElementById('result-desc').textContent = desc;
+    document.getElementById('result-verdict').textContent = verdict;
+
+    document.getElementById('step3').classList.remove('active');
+    document.getElementById('result').classList.add('active');
+  }
+
+  function restartQuiz() {
+    answers = {};
+    currentStep = 1;
+    document.getElementById('result').classList.remove('active');
+    document.querySelectorAll('.quiz-step').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.quiz-next').forEach(b => b.classList.remove('visible'));
+    document.getElementById('step1').classList.add('active');
+  }
+</script>
+
+</body>
+</html>
