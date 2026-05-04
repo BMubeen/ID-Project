@@ -863,6 +863,30 @@ function renderScene(){
     <div class="scene-body">${scene.body}</div>
     <div class="choice-label">What do you do?</div>
     <div class="choices">${chHTML}</div>`;
+
+  // Attach TTS buttons to the freshly rendered scene
+  const gameScene = document.getElementById('game-scene');
+
+  // One button on the title
+  const titleEl = gameScene.querySelector('.scene-title');
+  if (titleEl && !titleEl.querySelector('.tts-pill')) {
+    const t = (titleEl.innerText||'').trim();
+    if (t) titleEl.insertBefore(simTTSBtn(t), titleEl.firstChild);
+  }
+
+  // One button on the body (reads the whole paragraph)
+  const bodyEl = gameScene.querySelector('.scene-body');
+  if (bodyEl && !bodyEl.querySelector('.tts-pill')) {
+    const t = (bodyEl.innerText||'').trim();
+    if (t) bodyEl.insertBefore(simTTSBtn(t), bodyEl.firstChild);
+  }
+
+  // One button per choice
+  gameScene.querySelectorAll('.choice-btn').forEach(btn => {
+    if (btn.querySelector('.tts-pill')) return;
+    const t = (btn.innerText||'').replace(/→/g,'').trim();
+    if (t) btn.insertBefore(simTTSBtn(t), btn.firstChild);
+  });
 }
 
 function makeChoice(i){
@@ -901,6 +925,17 @@ function showEnding(){
   document.getElementById('outcome-title').textContent=ending.title;
   document.getElementById('outcome-desc').textContent=ending.desc;
   document.getElementById('outcome-lesson').textContent=ending.lesson;
+
+  // Attach TTS to outcome text after render
+  setTimeout(() => {
+    ['outcome-title','outcome-desc','outcome-lesson'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.querySelector('.tts-pill')) {
+        const t = (el.innerText||'').trim();
+        if (t) el.insertBefore(simTTSBtn(t), el.firstChild);
+      }
+    });
+  }, 50);
   document.getElementById('outcome-stats').innerHTML=
     ['money','health','safety','freedom'].map((k,_,__)=>
       `<div class="outcome-stat"><span class="os-num">${stats[k]}</span><div class="os-lbl">${k.charAt(0).toUpperCase()+k.slice(1)}</div></div>`
@@ -916,6 +951,48 @@ function resetSim(){
   document.getElementById('sim').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+
+
+// Helper: make a TTS pill button for dynamically rendered sim content
+function simTTSBtn(text) {
+  const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  const STOP = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>';
+  const btn = document.createElement('button');
+  btn.className = 'tts-pill';
+  btn.innerHTML = PLAY;
+  btn.setAttribute('aria-label', 'Listen');
+  btn.setAttribute('data-tip', 'Listen');
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (!window.speechSynthesis) return;
+    // If this button is already speaking, cancel
+    if (btn.classList.contains('speaking')) {
+      window.speechSynthesis.cancel();
+      btn.innerHTML = PLAY;
+      btn.classList.remove('speaking');
+      btn.setAttribute('data-tip','Listen');
+      return;
+    }
+    // Stop any other active TTS
+    window.speechSynthesis.cancel();
+    document.querySelectorAll('.tts-pill.speaking').forEach(b => {
+      b.innerHTML = PLAY; b.classList.remove('speaking'); b.setAttribute('data-tip','Listen');
+    });
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.92; u.pitch = 1.05; u.lang = 'en-CA';
+    const vv = window.speechSynthesis.getVoices();
+    const femNames = ['Samantha','Karen','Moira','Tessa','Fiona','Victoria','Allison','Ava','Zoe','Google UK English Female','Microsoft Zira','Microsoft Hazel','Microsoft Eva','Microsoft Sarah'];
+    let voice = null;
+    for (const n of femNames) { voice = vv.find(v => v.name.includes(n)); if (voice) break; }
+    if (!voice) voice = vv.find(v => v.lang.startsWith('en')) || null;
+    if (voice) u.voice = voice;
+    u.onstart = () => { btn.innerHTML = STOP; btn.classList.add('speaking'); btn.setAttribute('data-tip','Stop'); };
+    const done = () => { btn.innerHTML = PLAY; btn.classList.remove('speaking'); btn.setAttribute('data-tip','Listen'); };
+    u.onend = done; u.onerror = done;
+    window.speechSynthesis.speak(u);
+  });
+  return btn;
+}
 
 // ═══════════════════════════════════════════
 // TEXT-TO-SPEECH — v3: inline buttons, always visible
