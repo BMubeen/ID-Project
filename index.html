@@ -104,8 +104,8 @@ nav ul a:hover{color:var(--gold);}
 .ch-body.flip{grid-template-columns:2fr 3fr;}
 .ch-body.flip .ch-text{order:2;}
 .ch-body.flip .ch-aside{order:1;}
-.ch-text p{font-size:1rem;line-height:1.9;color:#2e2620;margin-bottom:1.3rem;}
-.ch-dark .ch-text p{color:#c8bfb4;}
+.ch-text{padding-right:2.5rem;}.ch-text p{font-size:1rem;line-height:1.9;color:#2e2620;margin-bottom:1.3rem;position:relative;}
+.ch-dark .ch-text p{color:#c8bfb4;}.thesis-body p{position:relative;}
 .stat-card{background:var(--ink);color:var(--cream);padding:2rem;margin-bottom:1.25rem;position:relative;overflow:hidden;}
 .stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);}
 .stat-card.r::before{background:var(--rust);}
@@ -915,6 +915,264 @@ function resetSim(){
   document.getElementById('game-main').style.display='grid';
   document.getElementById('sim').scrollIntoView({behavior:'smooth',block:'start'});
 }
+
+// ═══════════════════════════════════════════
+// TEXT-TO-SPEECH ENGINE
+// ═══════════════════════════════════════════
+(function(){
+  // Inject TTS button styles
+  const style = document.createElement('style');
+  style.textContent = `
+    .tts-para-wrap {
+      position: relative;
+    }
+    .tts-btn {
+      position: absolute;
+      left: -2.8rem;
+      top: 0.2rem;
+      width: 1.9rem;
+      height: 1.9rem;
+      border-radius: 50%;
+      border: 1px solid rgba(201,150,58,0.3);
+      background: rgba(201,150,58,0.08);
+      color: var(--gold);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s, border-color 0.2s, transform 0.15s;
+      flex-shrink: 0;
+      padding: 0;
+      outline: none;
+    }
+    .tts-para-wrap:hover .tts-btn,
+    .tts-btn.tts-speaking {
+      opacity: 1;
+    }
+    .tts-btn:hover {
+      background: rgba(201,150,58,0.2);
+      border-color: rgba(201,150,58,0.6);
+      transform: scale(1.1);
+    }
+    .tts-btn.tts-speaking {
+      background: rgba(184,74,30,0.2);
+      border-color: rgba(184,74,30,0.6);
+      color: var(--rust);
+      animation: tts-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes tts-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(184,74,30,0.3); }
+      50% { box-shadow: 0 0 0 5px rgba(184,74,30,0); }
+    }
+    .tts-btn svg { width: 0.8rem; height: 0.8rem; pointer-events: none; }
+
+    /* Dark chapter button variant */
+    .ch-dark .tts-btn {
+      border-color: rgba(201,150,58,0.2);
+      background: rgba(255,255,255,0.04);
+      color: rgba(201,150,58,0.7);
+    }
+    .ch-dark .tts-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(201,150,58,0.5);
+      color: var(--gold);
+    }
+    .ch-dark .tts-btn.tts-speaking {
+      background: rgba(184,74,30,0.25);
+      border-color: rgba(184,74,30,0.5);
+      color: #fca5a5;
+    }
+
+    /* thesis blockquote button */
+    .tts-blockquote-wrap {
+      position: relative;
+    }
+    .tts-blockquote-wrap .tts-btn {
+      left: auto;
+      right: -2.8rem;
+      top: 1rem;
+    }
+    .tts-blockquote-wrap:hover .tts-btn { opacity: 1; }
+
+    /* Tooltip */
+    .tts-btn::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 6px);
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: var(--cream);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      padding: 0.3rem 0.6rem;
+      border-radius: 2px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .tts-btn:hover::after { opacity: 1; }
+
+    /* Make ch-text paragraphs position:relative for absolute btn */
+    .ch-text { position: relative; }
+    .ch-text p { position: relative; }
+    .thesis-body p { position: relative; }
+  `;
+  document.head.appendChild(style);
+
+  // SVG icons
+  const iconPlay = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+  const iconStop = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>`;
+
+  let currentBtn = null;
+  let currentUtterance = null;
+
+  function stopAll() {
+    window.speechSynthesis.cancel();
+    if (currentBtn) {
+      currentBtn.classList.remove('tts-speaking');
+      currentBtn.innerHTML = iconPlay;
+      currentBtn.setAttribute('data-tip', 'Read aloud');
+      currentBtn = null;
+    }
+    currentUtterance = null;
+  }
+
+  function speakText(text, btn) {
+    if (!window.speechSynthesis) {
+      alert('Sorry, your browser does not support text-to-speech.');
+      return;
+    }
+
+    // If this button is already speaking, stop
+    if (currentBtn === btn) { stopAll(); return; }
+
+    // Stop anything else playing
+    stopAll();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.92;
+    utterance.pitch = 1.0;
+    utterance.lang = 'en-CA';
+
+    // Try to pick a good voice
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v =>
+      v.lang.startsWith('en') && (v.name.includes('Daniel') || v.name.includes('Karen') ||
+      v.name.includes('Samantha') || v.name.includes('Google UK') || v.name.includes('Microsoft'))
+    ) || voices.find(v => v.lang.startsWith('en')) || null;
+    if (preferred) utterance.voice = preferred;
+
+    utterance.onstart = () => {
+      currentBtn = btn;
+      btn.classList.add('tts-speaking');
+      btn.innerHTML = iconStop;
+      btn.setAttribute('data-tip', 'Stop');
+    };
+    utterance.onend = () => {
+      btn.classList.remove('tts-speaking');
+      btn.innerHTML = iconPlay;
+      btn.setAttribute('data-tip', 'Read aloud');
+      currentBtn = null;
+      currentUtterance = null;
+    };
+    utterance.onerror = () => {
+      btn.classList.remove('tts-speaking');
+      btn.innerHTML = iconPlay;
+      btn.setAttribute('data-tip', 'Read aloud');
+      currentBtn = null;
+    };
+
+    currentUtterance = utterance;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function createBtn(text) {
+    const btn = document.createElement('button');
+    btn.className = 'tts-btn';
+    btn.innerHTML = iconPlay;
+    btn.setAttribute('aria-label', 'Read this paragraph aloud');
+    btn.setAttribute('data-tip', 'Read aloud');
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      speakText(text, btn);
+    });
+    return btn;
+  }
+
+  function attachToElements() {
+    // Chapter body paragraphs
+    document.querySelectorAll('.ch-text p').forEach(p => {
+      const text = p.innerText.trim();
+      if (!text) return;
+      p.style.position = 'relative';
+      const btn = createBtn(text);
+      p.appendChild(btn);
+    });
+
+    // Thesis body paragraphs
+    document.querySelectorAll('.thesis-body p').forEach(p => {
+      const text = p.innerText.trim();
+      if (!text) return;
+      p.style.position = 'relative';
+      const btn = createBtn(text);
+      p.appendChild(btn);
+    });
+
+    // Thesis blockquote
+    const bq = document.querySelector('.thesis-body blockquote');
+    if (bq) {
+      const text = bq.innerText.trim();
+      const btn = createBtn(text);
+      btn.style.position = 'absolute';
+      btn.style.right = '-2.8rem';
+      btn.style.top = '1rem';
+      btn.style.left = 'auto';
+      bq.style.position = 'relative';
+      bq.appendChild(btn);
+    }
+
+    // Pull quotes
+    document.querySelectorAll('.pull-quote p').forEach(p => {
+      const text = p.innerText.trim();
+      if (!text) return;
+      p.style.position = 'relative';
+      const btn = createBtn(text);
+      btn.style.opacity = '0.5'; // always slightly visible for quotes
+      p.appendChild(btn);
+    });
+
+    // Fix button positioning — append inside p but float it right
+    // Actually reposition all paragraph buttons to sit right-aligned inside the p
+    document.querySelectorAll('.ch-text p .tts-btn, .thesis-body p .tts-btn, .pull-quote p .tts-btn').forEach(btn => {
+      btn.style.position = 'absolute';
+      btn.style.right = '-2.4rem';
+      btn.style.left = 'auto';
+      btn.style.top = '0.15rem';
+    });
+  }
+
+  // Voices may load async
+  if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = attachToElements;
+  }
+
+  // Run on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachToElements);
+  } else {
+    attachToElements();
+  }
+
+  // Stop speech when navigating away or hiding tab
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopAll();
+  });
+})();
 </script>
 </body>
 </html>
