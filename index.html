@@ -104,9 +104,9 @@ nav ul a:hover{color:var(--gold);}
 .ch-body.flip{grid-template-columns:2fr 3fr;}
 .ch-body.flip .ch-text{order:2;}
 .ch-body.flip .ch-aside{order:1;}
-.ch-text{padding-right:2.5rem;}.ch-text p{font-size:1rem;line-height:1.9;color:#2e2620;margin-bottom:1.3rem;position:relative;}
+.ch-text p{font-size:1rem;line-height:1.9;color:#2e2620;margin-bottom:1.3rem;position:relative;}
 .ch-dark .ch-text p{color:#c8bfb4;}.thesis-body p{position:relative;}
-.stat-card{background:var(--ink);color:var(--cream);padding:2rem;margin-bottom:1.25rem;position:relative;overflow:hidden;}
+.stat-card{background:var(--ink);color:var(--cream);padding:2rem;margin-bottom:1.25rem;position:relative;overflow:visible;}
 .stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);}
 .stat-card.r::before{background:var(--rust);}
 .stat-card.b::before{background:#7eb3d4;}
@@ -115,7 +115,7 @@ nav ul a:hover{color:var(--gold);}
 .stat-card.b .s-num{color:#7eb3d4;}
 .s-lbl{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--light-ash);}
 .s-note{font-size:.8rem;color:var(--ash);margin-top:.5rem;line-height:1.5;}
-.stat-card-inv{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-left:3px solid var(--gold);padding:2rem;margin-bottom:1.25rem;}
+.stat-card-inv{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-left:3px solid var(--gold);padding:2rem;margin-bottom:1.25rem;position:relative;}
 .stat-card-inv.r{border-left-color:var(--rust);}
 .stat-card-inv .s-num{color:var(--gold);}
 .stat-card-inv.r .s-num{color:var(--rust);}
@@ -916,262 +916,241 @@ function resetSim(){
   document.getElementById('sim').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+
 // ═══════════════════════════════════════════
-// TEXT-TO-SPEECH ENGINE
+// TEXT-TO-SPEECH — v3: inline buttons, always visible
+// Strategy: inject a small [▶] button as the FIRST child
+// of every readable block. No wrapping, no absolute pos tricks.
+// Button is inline-flex, sits at the start of the text flow.
 // ═══════════════════════════════════════════
-(function(){
-  // Inject TTS button styles
-  const style = document.createElement('style');
-  style.textContent = `
-    .tts-para-wrap {
-      position: relative;
-    }
-    .tts-btn {
-      position: absolute;
-      left: -2.8rem;
-      top: 0.2rem;
-      width: 1.9rem;
-      height: 1.9rem;
-      border-radius: 50%;
-      border: 1px solid rgba(201,150,58,0.3);
-      background: rgba(201,150,58,0.08);
-      color: var(--gold);
-      cursor: pointer;
-      display: flex;
+(function () {
+
+  /* ─── CSS ─── */
+  const s = document.createElement('style');
+  s.textContent = `
+    .tts-pill {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      opacity: 0;
-      transition: opacity 0.2s, background 0.2s, border-color 0.2s, transform 0.15s;
+      width: 1.55rem;
+      height: 1.55rem;
+      border-radius: 50%;
+      border: 1.5px solid rgba(201,150,58,0.45);
+      background: rgba(201,150,58,0.1);
+      color: #c9963a;
+      cursor: pointer;
+      vertical-align: middle;
+      margin-right: 0.45rem;
+      margin-top: -0.1rem;
       flex-shrink: 0;
       padding: 0;
       outline: none;
-    }
-    .tts-para-wrap:hover .tts-btn,
-    .tts-btn.tts-speaking {
-      opacity: 1;
-    }
-    .tts-btn:hover {
-      background: rgba(201,150,58,0.2);
-      border-color: rgba(201,150,58,0.6);
-      transform: scale(1.1);
-    }
-    .tts-btn.tts-speaking {
-      background: rgba(184,74,30,0.2);
-      border-color: rgba(184,74,30,0.6);
-      color: var(--rust);
-      animation: tts-pulse 1.2s ease-in-out infinite;
-    }
-    @keyframes tts-pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(184,74,30,0.3); }
-      50% { box-shadow: 0 0 0 5px rgba(184,74,30,0); }
-    }
-    .tts-btn svg { width: 0.8rem; height: 0.8rem; pointer-events: none; }
-
-    /* Dark chapter button variant */
-    .ch-dark .tts-btn {
-      border-color: rgba(201,150,58,0.2);
-      background: rgba(255,255,255,0.04);
-      color: rgba(201,150,58,0.7);
-    }
-    .ch-dark .tts-btn:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(201,150,58,0.5);
-      color: var(--gold);
-    }
-    .ch-dark .tts-btn.tts-speaking {
-      background: rgba(184,74,30,0.25);
-      border-color: rgba(184,74,30,0.5);
-      color: #fca5a5;
-    }
-
-    /* thesis blockquote button */
-    .tts-blockquote-wrap {
+      transition: background 0.18s, border-color 0.18s, transform 0.14s, color 0.18s;
       position: relative;
     }
-    .tts-blockquote-wrap .tts-btn {
-      left: auto;
-      right: -2.8rem;
-      top: 1rem;
+    .tts-pill svg {
+      width: 0.65rem;
+      height: 0.65rem;
+      display: block;
+      pointer-events: none;
     }
-    .tts-blockquote-wrap:hover .tts-btn { opacity: 1; }
-
-    /* Tooltip */
-    .tts-btn::after {
+    .tts-pill:hover {
+      background: rgba(201,150,58,0.28);
+      border-color: rgba(201,150,58,0.85);
+      transform: scale(1.12);
+    }
+    .tts-pill.speaking {
+      background: rgba(184,74,30,0.22);
+      border-color: rgba(184,74,30,0.75);
+      color: #ef4444;
+      animation: tts-ring 1.1s ease-in-out infinite;
+    }
+    @keyframes tts-ring {
+      0%,100% { box-shadow: 0 0 0 0 rgba(184,74,30,0.4); }
+      50%      { box-shadow: 0 0 0 5px rgba(184,74,30,0); }
+    }
+    /* dark bg variant */
+    .ch-dark .tts-pill,
+    .sim-section .tts-pill,
+    .timeline-section .tts-pill,
+    .concepts-section .tts-pill {
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.55);
+    }
+    .ch-dark .tts-pill:hover,
+    .sim-section .tts-pill:hover,
+    .timeline-section .tts-pill:hover,
+    .concepts-section .tts-pill:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(201,150,58,0.7);
+      color: #c9963a;
+    }
+    .ch-dark .tts-pill.speaking,
+    .sim-section .tts-pill.speaking {
+      border-color: rgba(239,68,68,0.7);
+      background: rgba(239,68,68,0.15);
+      color: #fca5a5;
+    }
+    /* tooltip */
+    .tts-pill::after {
       content: attr(data-tip);
       position: absolute;
+      bottom: calc(100% + 5px);
       left: 50%;
-      bottom: calc(100% + 6px);
       transform: translateX(-50%);
-      background: var(--ink);
-      color: var(--cream);
+      background: #120e09;
+      color: #f2ead8;
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.08em;
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       white-space: nowrap;
-      padding: 0.3rem 0.6rem;
+      padding: 0.2rem 0.5rem;
       border-radius: 2px;
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.15s;
+      z-index: 9999;
     }
-    .tts-btn:hover::after { opacity: 1; }
-
-    /* Make ch-text paragraphs position:relative for absolute btn */
-    .ch-text { position: relative; }
-    .ch-text p { position: relative; }
-    .thesis-body p { position: relative; }
+    .tts-pill:hover::after { opacity: 1; }
   `;
-  document.head.appendChild(style);
+  document.head.appendChild(s);
 
-  // SVG icons
-  const iconPlay = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
-  const iconStop = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>`;
+  /* ─── Icons ─── */
+  const PLAY = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+  const STOP = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>`;
 
-  let currentBtn = null;
-  let currentUtterance = null;
+  let activeBtn = null;
 
+  /* ─── Female voice picker ─── */
+  function femaleVoice() {
+    const vv = window.speechSynthesis.getVoices();
+    const names = [
+      'Samantha','Karen','Moira','Tessa','Fiona','Victoria',
+      'Allison','Ava','Susan','Zoe','Alice',
+      'Google UK English Female','Google US English',
+      'Microsoft Zira','Microsoft Hazel','Microsoft Linda',
+      'Microsoft Eva','Microsoft Sarah','Microsoft Susan'
+    ];
+    for (const n of names) {
+      const found = vv.find(v => v.name.includes(n));
+      if (found) return found;
+    }
+    return vv.find(v => v.lang.startsWith('en') && /female|woman/i.test(v.name))
+        || vv.find(v => v.lang.startsWith('en-GB'))
+        || vv.find(v => v.lang.startsWith('en'))
+        || null;
+  }
+
+  /* ─── Stop everything ─── */
   function stopAll() {
     window.speechSynthesis.cancel();
-    if (currentBtn) {
-      currentBtn.classList.remove('tts-speaking');
-      currentBtn.innerHTML = iconPlay;
-      currentBtn.setAttribute('data-tip', 'Read aloud');
-      currentBtn = null;
+    if (activeBtn) {
+      activeBtn.innerHTML = PLAY;
+      activeBtn.classList.remove('speaking');
+      activeBtn.setAttribute('data-tip', 'Listen');
+      activeBtn = null;
     }
-    currentUtterance = null;
   }
 
-  function speakText(text, btn) {
-    if (!window.speechSynthesis) {
-      alert('Sorry, your browser does not support text-to-speech.');
-      return;
-    }
-
-    // If this button is already speaking, stop
-    if (currentBtn === btn) { stopAll(); return; }
-
-    // Stop anything else playing
+  /* ─── Speak ─── */
+  function speak(text, btn) {
+    if (!window.speechSynthesis) return;
+    if (activeBtn === btn) { stopAll(); return; }
     stopAll();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.92;
-    utterance.pitch = 1.0;
-    utterance.lang = 'en-CA';
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate  = 0.92;
+    u.pitch = 1.05;
+    u.lang  = 'en-CA';
+    const v = femaleVoice();
+    if (v) u.voice = v;
 
-    // Try to pick a good voice
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v =>
-      v.lang.startsWith('en') && (v.name.includes('Daniel') || v.name.includes('Karen') ||
-      v.name.includes('Samantha') || v.name.includes('Google UK') || v.name.includes('Microsoft'))
-    ) || voices.find(v => v.lang.startsWith('en')) || null;
-    if (preferred) utterance.voice = preferred;
-
-    utterance.onstart = () => {
-      currentBtn = btn;
-      btn.classList.add('tts-speaking');
-      btn.innerHTML = iconStop;
+    u.onstart = () => {
+      activeBtn = btn;
+      btn.innerHTML = STOP;
+      btn.classList.add('speaking');
       btn.setAttribute('data-tip', 'Stop');
     };
-    utterance.onend = () => {
-      btn.classList.remove('tts-speaking');
-      btn.innerHTML = iconPlay;
-      btn.setAttribute('data-tip', 'Read aloud');
-      currentBtn = null;
-      currentUtterance = null;
+    const done = () => {
+      btn.innerHTML = PLAY;
+      btn.classList.remove('speaking');
+      btn.setAttribute('data-tip', 'Listen');
+      if (activeBtn === btn) activeBtn = null;
     };
-    utterance.onerror = () => {
-      btn.classList.remove('tts-speaking');
-      btn.innerHTML = iconPlay;
-      btn.setAttribute('data-tip', 'Read aloud');
-      currentBtn = null;
-    };
-
-    currentUtterance = utterance;
-    window.speechSynthesis.speak(utterance);
+    u.onend = done; u.onerror = done;
+    window.speechSynthesis.speak(u);
   }
 
-  function createBtn(text) {
-    const btn = document.createElement('button');
-    btn.className = 'tts-btn';
-    btn.innerHTML = iconPlay;
-    btn.setAttribute('aria-label', 'Read this paragraph aloud');
-    btn.setAttribute('data-tip', 'Read aloud');
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      speakText(text, btn);
-    });
-    return btn;
+  /* ─── Make a button ─── */
+  function mkBtn(text) {
+    const b = document.createElement('button');
+    b.className = 'tts-pill';
+    b.innerHTML = PLAY;
+    b.setAttribute('aria-label', 'Listen');
+    b.setAttribute('data-tip', 'Listen');
+    b.addEventListener('click', e => { e.stopPropagation(); speak(text, b); });
+    return b;
   }
 
-  function attachToElements() {
-    // Chapter body paragraphs
-    document.querySelectorAll('.ch-text p').forEach(p => {
-      const text = p.innerText.trim();
-      if (!text) return;
-      p.style.position = 'relative';
-      const btn = createBtn(text);
-      p.appendChild(btn);
-    });
+  /* ─── Prepend button as first child of el ─── */
+  function attach(el) {
+    if (!el || el.querySelector('.tts-pill')) return; // already done
+    const text = (el.innerText || el.textContent || '').replace(/Listen|Stop/g,'').trim();
+    if (text.length < 8) return;
+    const btn = mkBtn(text);
+    el.insertBefore(btn, el.firstChild);
+  }
 
-    // Thesis body paragraphs
-    document.querySelectorAll('.thesis-body p').forEach(p => {
-      const text = p.innerText.trim();
-      if (!text) return;
-      p.style.position = 'relative';
-      const btn = createBtn(text);
-      p.appendChild(btn);
-    });
+  /* attach one button per whole box — reads all text inside */
+  function attachBox(el) {
+    if (!el || el.querySelector('.tts-pill')) return;
+    const text = (el.innerText || el.textContent || '').replace(/Listen|Stop/g,'').trim();
+    if (text.length < 8) return;
+    const btn = mkBtn(text);
+    el.style.position = 'relative';
+    btn.style.position = 'absolute';
+    btn.style.top = '0.6rem';
+    btn.style.right = '0.6rem';
+    btn.style.margin = '0';
+    el.appendChild(btn);
+  }
 
-    // Thesis blockquote
-    const bq = document.querySelector('.thesis-body blockquote');
-    if (bq) {
-      const text = bq.innerText.trim();
-      const btn = createBtn(text);
-      btn.style.position = 'absolute';
-      btn.style.right = '-2.8rem';
-      btn.style.top = '1rem';
-      btn.style.left = 'auto';
-      bq.style.position = 'relative';
-      bq.appendChild(btn);
+  /* ─── Attach to everything ─── */
+  function run() {
+    // BOXES: one button reads the entire card/quote
+    document.querySelectorAll('.pull-quote').forEach(attachBox);
+    document.querySelectorAll('.stat-card, .stat-card-inv').forEach(attachBox);
+    document.querySelectorAll('.hero-stat').forEach(attachBox);
+    document.querySelectorAll('.t-event').forEach(attachBox);
+    document.querySelectorAll('.concept-card').forEach(attachBox);
+    document.querySelectorAll('.sim-id-card').forEach(attachBox);
+
+    // PARAGRAPHS: one button per paragraph
+    document.querySelectorAll('.thesis-body blockquote, .thesis-body p, .thesis-sticky h2').forEach(attach);
+    document.querySelectorAll('.ch-title, .ch-sub').forEach(attach);
+    document.querySelectorAll('.ch-text p').forEach(attach);
+    document.querySelectorAll('.hero-sub').forEach(attach);
+    document.querySelectorAll('.sim-intro h2, .sim-intro-desc, .sim-rule').forEach(attach);
+    document.querySelectorAll('.outcome-title, .outcome-desc, .outcome-lesson p').forEach(attach);
+    document.querySelectorAll('.footer-meta').forEach(attach);
+  }
+
+  // Run immediately + after voices load async
+  const go = () => {
+    run();
+    if (typeof speechSynthesis.onvoiceschanged !== 'undefined') {
+      speechSynthesis.onvoiceschanged = run;
     }
+  };
 
-    // Pull quotes
-    document.querySelectorAll('.pull-quote p').forEach(p => {
-      const text = p.innerText.trim();
-      if (!text) return;
-      p.style.position = 'relative';
-      const btn = createBtn(text);
-      btn.style.opacity = '0.5'; // always slightly visible for quotes
-      p.appendChild(btn);
-    });
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', go)
+    : setTimeout(go, 80);
 
-    // Fix button positioning — append inside p but float it right
-    // Actually reposition all paragraph buttons to sit right-aligned inside the p
-    document.querySelectorAll('.ch-text p .tts-btn, .thesis-body p .tts-btn, .pull-quote p .tts-btn').forEach(btn => {
-      btn.style.position = 'absolute';
-      btn.style.right = '-2.4rem';
-      btn.style.left = 'auto';
-      btn.style.top = '0.15rem';
-    });
-  }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopAll(); });
 
-  // Voices may load async
-  if (window.speechSynthesis.onvoiceschanged !== undefined) {
-    window.speechSynthesis.onvoiceschanged = attachToElements;
-  }
-
-  // Run on DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', attachToElements);
-  } else {
-    attachToElements();
-  }
-
-  // Stop speech when navigating away or hiding tab
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopAll();
-  });
 })();
 </script>
 </body>
